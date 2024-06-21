@@ -14,7 +14,7 @@ library (plyr)
 library(ComplexUpset)
 library(UpSetR)
 library(ggupset)
-library(tidyverse, warn.conflicts = FALSE)
+library(tidyverse)
 library(pheatmap)
 library(table1)
 library(flextable)
@@ -533,9 +533,8 @@ ggplot(gg) +
 dev.off()
 
 #Supplementary Fig 5B
-a<-biome.Species[,c(4,6,50:79)]
 
-mAirData <- melt(a)
+mAirData <- melt(biome.Species)
 
 tiff("species_country_um2.tiff", units="in", width=10, height=6, res=400)
 
