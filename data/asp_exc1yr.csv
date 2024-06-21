@@ -1,0 +1,7 @@
+yAxis,boxOdds,bocCILow,boxCIHigh,sig,p
+Asp f,4.83,1.7,13.77,0.003,y
+Age,0.94,0.86,1.03,0.195,n
+BMI,1.04,0.95,1.15,0.414,n
+Ex Smoker,1.14,0.41,3.13,0.806,n
+FEV1 %predicted,0.97,0.95,1,0.09,n
+Non-FE,0.6,0.21,1.71,0.336,n
