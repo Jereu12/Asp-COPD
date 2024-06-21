@@ -65,14 +65,14 @@ asp.prev<- read.csv("~/data/asp.prev.csv")
 
 #Figure 1 upset plot
 sg<-subset(Master, Master$Study=="Singapore")#only singapore data
-#create prevalence true and false for Aspergillus spp
+#Create prevalence TRUE or FALSE for Aspergillus spp.
 aa<-sg[,(4:17)]
-at<-aa>0
+at<-aa>0 
 ind1<-colSums(at)!=0
 z<-at[,ind1]
 aa.p<-cbind(sg[,c(1:3)],z)
 
-#CONVERT TRUE TO NAME OF FUNGI NA TO EMPTY
+#CONVERT TRUE TO NAME OF FUNGI, OTHERWISE AS NA 
 linelist_sym_1 <- aa.p %>% 
   mutate(A.fumigatus = ifelse( A.fumigatus== "TRUE", "A.fumigatus", NA), 
          A.steynii = ifelse(A.steynii == "TRUE", "A.steynii", NA),
@@ -94,7 +94,6 @@ linelist_sym_1 <- linelist_sym_1 %>%
         remove = TRUE,
         na.rm = TRUE) %>% 
   mutate(
-    # make a copy of all_symptoms column, but of class "list" (which is required to use ggupset() in next step)
     all_asp_list = as.list(strsplit(all_asp, "; "))
   )
 
