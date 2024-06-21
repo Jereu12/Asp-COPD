@@ -123,6 +123,7 @@ dev.off()
 f2<-cbind(env_data,Master)
 copd_bf<-subset(f2,f2$Study=="Singapore")
 
+##correlation between A.fumigatus and environment parameter
 p2<-ggscatter(copd_bf, y = "A.fumigatus", x = "pm25", color = "SampleType",
               add = "reg.line", conf.int = TRUE, 
               cor.coef = TRUE, cor.method = "spearman",xlab = "PM 2.5 (µg/m3) ",palette = c("purple", "orange", "green3"),
@@ -167,8 +168,9 @@ dev.off()
 
 #Figure 3 
 #F3A-B
+##correlation between A.fumigatus and exacerbations
 
-e1<-ggscatter(copd_bf, y = "A.fumigatus", x = "totalexac", color = "SampleType",
+e1<-ggscatter(copd_bf, y = "A.fumigatus", x = "Total_Exacerbation", color = "SampleType",
               add = "reg.line", conf.int = TRUE, 
               cor.coef = TRUE, cor.method = "spearman",ylab="A. fumigatus\n relative abundance (log 10)",xlab = "No. of Exacerbations\n in the preceding year",palette = c("purple", "orange", "green3"),
               cor.coeff.args = list(method = "spearman"),add.params = list(color = "black", fill = "lightgray", linetype=2))+ scale_x_continuous(breaks = seq(1, 12, 3))+labs(color="")+scale_y_log10()
@@ -196,15 +198,16 @@ dev.off()
 
 #F3C-D
 in_copd<-subset(Clinical_data, Clinical_data$Study=="Singapore") #subset singapore data
+#aspf_env=presence/abscence of A.fumigatus in the environment
 
 kruskal.test(in_copd$Total_Exacerbation~in_copd$aspf_env)#0.02255
-kruskal.test(in_copd$Texac1yr~in_copd$aspf_env)#0.002975
+kruskal.test(in_copd$Texac1yr~in_copd$aspf_env)#0.002975  
 
-b<-ggplot(in_copd, aes(x=factor(aspf_env), y=Total_Exacerbation))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(aspf_env)),position = position_jitter(0.1),size=2.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("grey", "palevioletred1","blue"))+scale_x_discrete(labels=c("Moderate","High"))+xlab("A. fumigatus")+ylab("No. of Exacerbations\n in the preceding year")+ylim(0,6)+labs(fill="")+theme(axis.title.x = element_text(face = "italic"))
+bex<-ggplot(in_copd, aes(x=factor(aspf_env), y=Total_Exacerbation))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(aspf_env)),position = position_jitter(0.1),size=2.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("grey", "palevioletred1","blue"))+scale_x_discrete(labels=c("Moderate","High"))+xlab("A. fumigatus")+ylab("No. of Exacerbations\n in the preceding year")+ylim(0,6)+labs(fill="")+theme(axis.title.x = element_text(face = "italic"))
 ex1<-ggplot(in_copd, aes(x=factor(aspf_env), y=Texac1yr))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(aspf_env)),position = position_jitter(0.1),size=2.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("grey", "palevioletred1","blue"))+scale_x_discrete(labels=c("Moderate","High"))+xlab("A. fumigatus")+ylab("No. of Exacerbations\nduring 1 year follow-up")+ylim(0,6)+labs(fill="")+theme(axis.title.x = element_text(face = "italic"))
 
 tiff("fig3c.d.tiff", units="in", width=9, height=4, res=400)
-ggarrange(b,ex1,labels = NA,common.legend = T,legend="none", ncol=2,nrow=1)
+ggarrange(bex,ex1,labels = NA,common.legend = T,legend="none", ncol=2,nrow=1)
 dev.off()
 
 
@@ -213,6 +216,7 @@ dev.off()
 x<-glm.nb(Total_Exacerbation~factor(aspf_env)+Age+BMI+Smoking.Status+FEV1_percent_predicted,data=in_copd)
 summary(x)
 exp(coef(x))
+
 #calculate IRR- exacerbation at one year follow-up
 x<-glm.nb(Texac1yr~factor(aspf_env)+Age+BMI+Smoking.Status+FEV1_percent_predicted+factor(FE),data=in_copd)
 summary(x)
@@ -233,7 +237,7 @@ my.labels=c("Age","BMI",
             "Ex-smoker",expression(paste("FEV", scriptstyle("1")," % predicted")), "Non-FE",expression(paste("",italic("A.fumigatus"))))
 p1<-p1+scale_y_discrete(labels=my.labels)
 
-#Forest plot exacerbation at preceding year
+#Forest plot for exacerbation at preceding year
 asp_exc_b$yAxis<-factor(asp_exc_b$yAxis, levels = c("Age","BMI","Ex Smoker","FEV1 %predicted","A.fumigatus"))
 
 p2 <- ggplot(asp_exc_b  , aes(x = boxOdds, y = yAxis))
@@ -269,27 +273,26 @@ dev.off()
 data_subset <- Asp_allergen[ , c("af3_pos2","af5_pos2","af6_pos2")] 
 df <- Asp_allergen[complete.cases(data_subset), ]
 
+#af3_pos2=positive/negative Asp f3 sensitization (Plasma screening) 
+#af5_pos2=positive/negative Asp f5 sensitization (Plasma screening) 
+#af6_pos2=positive/negative Asp f6 sensitization (Plasma screening) 
+
 kruskal.test(Asp_allergen$Asp.f.3~Asp_allergen$af3_pos2)#0.043
 kruskal.test(Asp_allergen$Asp.f.5~Asp_allergen$af5_pos2)#0.8486
 kruskal.test(Asp_allergen$Asp.f.6~Asp_allergen$af6_pos2)#0.4669
 
-#value 
-nx<-subset(Asp_allergen,Asp_allergen$af3_pos2=="0")
-sx<-subset(Asp_allergen,Asp_allergen$af3_pos2=="1")
-summary(sx$Asp.f.3)
-summary(nx$Asp.f.3)
-
-ggplot(df, aes(x=factor(af1_pos2), y=Asp.f.1))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("rAsp f3")+ylab("Asp f 3\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensiized"))+labs(fill="")
-f3<-ggplot(df, aes(x=factor(af3_pos2), y=Asp.f.3.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 3")+ylab("Asp f 3\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
-f5<-ggplot(df, aes(x=factor(af5_pos2), y=Asp.f.5.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 5")+ylab("Asp f 5\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
-f6<-ggplot(df, aes(x=factor(af6_pos2), y=Asp.f.6.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 6")+ylab("Asp f 6\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
+af3<-ggplot(df, aes(x=factor(af3_pos2), y=Asp.f.3.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 3")+ylab("Asp f 3\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
+af5<-ggplot(df, aes(x=factor(af5_pos2), y=Asp.f.5.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 5")+ylab("Asp f 5\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
+af6<-ggplot(df, aes(x=factor(af6_pos2), y=Asp.f.6.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 6")+ylab("Asp f 6\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
 
 tiff("fig4b_d.tiff", units="in", width=12, height=4, res=400)
-ggarrange(f3,f5,f6,labels = NA,common.legend = T,legend="right", ncol=3,nrow=1)
+ggarrange(af3,af5,af6,labels = NA,common.legend = T,legend="right", ncol=3,nrow=1)
 dev.off()
 
 #Fig 4 E-H
 in_copd<-subset(Clinical_data, Clinical_data$Study=="Singapore")
+
+#f3_env=exposed/exposed and sensitized to Asp f3
 
 f3te<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=Total_Exacerbation))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("No. of Exacerbation\nin the preceding year")+scale_y_continuous(breaks = c(0,2,4,6,8,10))+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
 f3t1<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=Texac1yr))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("No. of Exacerbation\nduring 1 year follow-up")+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
@@ -306,13 +309,6 @@ kruskal.test(in_copd$Texac1yr~in_copd$f3_env)#0.0443
 kruskal.test(in_copd$FEV1_percent_predicted~in_copd$f3_env)#0.0277
 kruskal.test(in_copd$CAT_score~in_copd$f3_env)#0.3998
 
-#value
-ee<-subset(in_copd,in_copd$f3_env=="E")
-ees<-subset(in_copd,in_copd$f3_env=="ES")
-summary(ees$FEV1_percent_predicted)
-summary(ee$FEV1_percent_predicted)
-summary(ees$Texac1yr)
-summary(ee$Texac1yr)
 
 #Fig 5 A
 
@@ -340,11 +336,10 @@ dev.off()
 
 #Figure 5 B-D
 
-
 f2<-cbind(env_data,Master)
 canc<-subset(f2,f2$Study=="Vancouver")#subset vancouver data
 
-gec<-ggscatter(canc, y = "A.fumigatus", x = "totalexac", color = "SampleType",
+gec<-ggscatter(canc, y = "A.fumigatus", x = "Total_Exacerbation", color = "SampleType",
                add = "reg.line", conf.int = TRUE, 
                cor.coef = TRUE, cor.method = "spearman",xlab = "No. of Exacerbations\nin the preceding year",palette = c("purple", "orange", "green3"),
                cor.coeff.args = list(method = "spearman"),add.params = list(color = "black", fill = "lightgray", linetype=2))+labs(color="")+scale_y_continuous(limits = c(0,0.75))
@@ -371,7 +366,7 @@ ggarrange(gec,gcc,gfc,labels = NA,common.legend = T,legend="right", ncol=3,nrow=
 dev.off()
 
 #Figure 6
-Asp_allergen$cat10<-Asp_allergen$CAT_score>9
+Asp_allergen$cat10<-Asp_allergen$CAT_score>9 #categorized CAT score to more/equal to 10 or less than 10
 aspc<-subset(Asp_allergen, SampleType%in% c('Indoor' , 'Outdoor')) #subset indoor and outdoor samples
 aspc$Study<-factor(aspc$Study, levels = c("Vancouver","Singapore"))
 
@@ -384,12 +379,6 @@ cfev<-cfev+labs(x=expression(paste("GOLD ","(FEV", scriptstyle("1")," % predicte
 tiff("Fig6.tiff", units="in", width=8, height=6, res=400)
 ggarrange(ce,ffe,ccat,cfev,labels = NA,common.legend = T,legend="right", ncol=2,nrow=2)
 dev.off()
-
-#value
-ffe<-subset(aspc,aspc$FE=="1")
-nffe<-subset(aspc,aspc$FE=="0")
-summary(nffe$asp_al)
-summary(ffe$asp_al)
 
 kruskal.test(asp_al~FE, data=aspc)#0.028
 kruskal.test(asp_al~Study, data=aspc)#0.00047
@@ -405,7 +394,7 @@ ggplot(blank, aes(x=ID, y=Read.count))+geom_point(aes(shape=Specimen.type,fill=S
 dev.off()
 
 #e-fig1b
-cc<-blank[,c(2,5,7:45)]#others as 0 
+cc<-blank[,c(2,5,7:45)]
 mAirData<-melt(cc)
 
 tiff("e-fig1b.tiff", units="in", width=8, height=5, res=400)
@@ -449,22 +438,22 @@ dev.off()
 
 #Supplementary Figure 3
 
-tt<-ggscatter(f3, y = "Temp", x = "Total_Exacerbation", 
+tt<-ggscatter(Clinical_data, y = "Temp", x = "Total_Exacerbation", 
               add = "reg.line", conf.int = TRUE, 
               cor.coef = TRUE, cor.method = "spearman",xlab = "No. of Exacerbations\nin the preceding year",
               cor.coeff.args = list(method = "spearman", label.x.npc = "left", label.y = 38),add.params = list(color = "blue", fill = "lightgray", linetype=2))+ scale_x_continuous(breaks = seq(1, 12, 3))+labs(color="")+ylab("Temperature (°C)")
 
-tr<-ggscatter(f3, y = "RH", x = "Total_Exacerbation", 
+tr<-ggscatter(Clinical_data, y = "RH", x = "Total_Exacerbation", 
               add = "reg.line", conf.int = TRUE, 
               cor.coef = TRUE, cor.method = "spearman",xlab = "No. of Exacerbations\nin the preceding year",
               cor.coeff.args = list(method = "spearman", label.x.npc = "left", label.y = 90),add.params = list(color = "blue", fill = "lightgray", linetype=2))+ scale_x_continuous(breaks = seq(1, 12, 3))+labs(color="")+ylab("Relative humidity (%)")
 
-tp<-ggscatter(f3, y = "pm10", x = "Total_Exacerbation",
+tp<-ggscatter(Clinical_data, y = "pm10", x = "Total_Exacerbation",
               add = "reg.line", conf.int = TRUE, 
               cor.coef = TRUE, cor.method = "spearman",xlab = "No. of Exacerbations\nin the preceding year",
               cor.coeff.args = list(method = "spearman", label.x.npc = "left", label.y = 70),add.params = list(color = "blue", fill = "lightgray", linetype=2))+ scale_x_continuous(breaks = seq(1, 12, 3))+labs(color="")+ylab("PM 10 (µg/m3)")
 
-tp2<-ggscatter(f3, y = "pm25", x = "Total_Exacerbation",
+tp2<-ggscatter(Clinical_data, y = "pm25", x = "Total_Exacerbation",
                add = "reg.line", conf.int = TRUE, 
                cor.coef = TRUE, cor.method = "spearman",xlab = "No. of Exacerbations\nin the preceding year",
                cor.coeff.args = list(method = "spearman", label.x.npc = "left", label.y = 150),add.params = list(color = "blue", fill = "lightgray", linetype=2))+ scale_x_continuous(breaks = seq(1, 12, 3))+labs(color="")+ylab("PM 2.5 (µg/m3)")
@@ -476,7 +465,7 @@ dev.off()
 ##Supplementary Figure 4
 
 library(ggbreak)
-mAirData <- melt(sputum_ITS )
+mAirData <- melt(sputum_ITS)
 
 tiff("e-fig4.tiff", units="in", width=6, height=6, res=400)
 
@@ -518,8 +507,6 @@ gg <- data.frame(cluster=factor(Master$labels.Type), x=Master$Dim1, y=Master$Dim
 centroids <- aggregate(cbind(x,y)~cluster,data=gg,mean)
 gg <- merge(gg,centroids,by="cluster",suffixes=c("",".centroid"))
 
-
-
 tiff("e-fig5a.tiff", units="in", width=6, height=4, res=400)
 ggplot(gg) +
   scale_linetype_identity() + 
@@ -531,6 +518,7 @@ ggplot(gg) +
        y = "PC2", x = "PC1 ")+ labs(color='')+ 
   theme(legend.position = "bottom")+theme_classic()+guides(fill="none")
 dev.off()
+
 
 #Supplementary Fig 5B
 
