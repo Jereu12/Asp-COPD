@@ -27,38 +27,38 @@ library(colorspace)
 #Load data
 
 ## Fungi species relative abundance 
-Master <- read.csv("~/Desktop/copd_fungi_ra.csv")
+Master <- read.csv("~/data/copd_fungi_ra.csv")
 
 # Top 30 fungi species
-biome.Species <- read.csv("~/Desktop/air/top/CSV/biome-Species.csv", row.names=1)
+biome.Species <- read.csv("~/data/biome-Species.csv", row.names=1)
 
 ##Environment data
-env_data <- read.csv("~/Desktop/env_data.csv", row.names=1)
+env_data <- read.csv("~/data/env_data.csv", row.names=1)
 
 ##Clinical data
-Clinical_data <- read.csv("~/Desktop/Clinical_data.csv", row.names=1)
+Clinical_data <- read.csv("~/data/Clinical_data.csv", row.names=1)
 
 ## Aspergillus allergen data
-Asp_allergen <- read.csv("~/Desktop/Asp_allergen.csv", row.names=1)
+Asp_allergen <- read.csv("~/data/Asp_allergen.csv", row.names=1)
 
 ## Aspergillus abundance data
-Asp_ab <- read.csv("~/Desktop/Asp_ab.csv")
+Asp_ab <- read.csv("~/data/Asp_ab.csv")
 
 
 ##Forest plot data Exacerbation preceding year
-asp_exc_b <- read.csv("~/Desktop/asp_exc_b.csv")
+asp_exc_b <- read.csv("~/data/asp_exc_b.csv")
 
 ##Forest plot data Exacerbation 1 year follow up
-asp_exc1yr <- read.csv("~/Desktop/asp_exc1yr.csv")
+asp_exc1yr <- read.csv("~/data/asp_exc1yr.csv")
 
 ##Blank data
-blank <- read.csv("~/Desktop/blank.csv")
+blank <- read.csv("~/data/blank.csv")
 
 ## Sputum ITS data
-sputum_ITS <- read.csv("~/Desktop/sputum_ITS.csv", row.names=1)
+sputum_ITS <- read.csv("~/data/sputum_ITS.csv", row.names=1)
 
 #Asp Prevalence summarized data
-asp.prev<- read.csv("~/Desktop/asp.prev.csv")
+asp.prev<- read.csv("~/data/asp.prev.csv")
 
 ######
 ###########
