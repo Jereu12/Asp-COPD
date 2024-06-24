@@ -21,6 +21,7 @@ library(flextable)
 library(MASS)
 library(jtools)
 library(colorspace)
+library(ggsignif)
 
 
 
