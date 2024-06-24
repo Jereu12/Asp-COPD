@@ -187,9 +187,6 @@ e2<-e2+labs(y = ~ atop(paste('',italic("A.fumigatus")),
                        paste("relative abundance (log",
                              scriptstyle("10"),")")))
 
-#OR
-my_y_title <- expression(paste("", italic("A.fumigatus "), " RA (log 10)"))
-e1<-e1+labs(y =my_y_title)
 
 tiff("fig3a.b.tiff", units="in", width=9, height=4, res=400)
 ggarrange(e1,e2,labels = NA,common.legend = T,legend="right", ncol=2,nrow=1)
@@ -202,8 +199,8 @@ in_copd<-subset(Clinical_data, Clinical_data$Study=="Singapore") #subset singapo
 kruskal.test(in_copd$Total_Exacerbation~in_copd$aspf_env)#0.02255
 kruskal.test(in_copd$Texac1yr~in_copd$aspf_env)#0.002975  
 
-bex<-ggplot(in_copd, aes(x=factor(aspf_env), y=Total_Exacerbation))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(aspf_env)),position = position_jitter(0.1),size=2.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("grey", "palevioletred1","blue"))+scale_x_discrete(labels=c("Moderate","High"))+xlab("A. fumigatus")+ylab("No. of Exacerbations\n in the preceding year")+ylim(0,6)+labs(fill="")+theme(axis.title.x = element_text(face = "italic"))
-ex1<-ggplot(in_copd, aes(x=factor(aspf_env), y=Texac1yr))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(aspf_env)),position = position_jitter(0.1),size=2.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("grey", "palevioletred1","blue"))+scale_x_discrete(labels=c("Moderate","High"))+xlab("A. fumigatus")+ylab("No. of Exacerbations\nduring 1 year follow-up")+ylim(0,6)+labs(fill="")+theme(axis.title.x = element_text(face = "italic"))
+bex<-ggplot(in_copd, aes(x=factor(aspf_env), y=Total_Exacerbation))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(aspf_env)),position = position_jitter(0.1),size=2.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("grey", "palevioletred1","blue"))+scale_x_discrete(labels=c("Moderate","High"))+xlab("A. fumigatus")+ylab("No. of Exacerbations\n in the preceding year")+scale_y_continuous(breaks = c(2,4,6,8,10))+labs(fill="")+theme(axis.title.x = element_text(face = "italic"))+geom_signif( comparisons = list(c("0","1")),tip_length = 0, size=0,textsize =6 ,map_signif_level = TRUE,y=9)
+ex1<-ggplot(in_copd, aes(x=factor(aspf_env), y=Texac1yr))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(aspf_env)),position = position_jitter(0.1),size=2.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("grey", "palevioletred1","blue"))+scale_x_discrete(labels=c("Moderate","High"))+xlab("A. fumigatus")+ylab("No. of Exacerbations\nduring 1 year follow-up")+scale_y_continuous(breaks = c(2,4,6,8,10), limits = c(0,10))+labs(fill="")+theme(axis.title.x = element_text(face = "italic"))+geom_signif( comparisons = list(c("0","1")),tip_length = 0, size=0,textsize =6 ,map_signif_level = TRUE,y=9)
 
 tiff("fig3c.d.tiff", units="in", width=9, height=4, res=400)
 ggarrange(bex,ex1,labels = NA,common.legend = T,legend="none", ncol=2,nrow=1)
@@ -256,7 +253,7 @@ tiff("fig3e_f.tiff", units="in", width=8, height=3, res=400)
 ggarrange(p2,p1,ncol=2, nrow=1)
 dev.off()
 
-#Figure 4 A
+##Figure 4 A
 sga<-subset(Asp_allergen,Asp_allergen$Study=="Singapore") #subset singapore data
 f4<-sga[,c(20:42)]
 f4<-t(f4)
@@ -266,27 +263,32 @@ pheatmap(f4,cluster_cols = F, cluster_rows = F, fontsize = 9,show_colnames=F, co
            c("aliceblue","aliceblue","white","lightskyblue1","dodgerblue","royalblue4"),scale = "row",gaps_col = c(42,42,86,86))
 dev.off()
 
-#Figure 4 B-D
+##Figure 4 B-D
 
 # to exclude row with missing data 
-data_subset <- Asp_allergen[ , c("af3_pos2","af5_pos2","af6_pos2")] 
+data_subset <- Asp_allergen[ , c("af3_pos2")] 
 df <- Asp_allergen[complete.cases(data_subset), ]
 
 #af3_pos2=positive/negative Asp f3 sensitization (Plasma screening) 
 #af5_pos2=positive/negative Asp f5 sensitization (Plasma screening) 
 #af6_pos2=positive/negative Asp f6 sensitization (Plasma screening) 
 
-kruskal.test(Asp_allergen$Asp.f.3~Asp_allergen$af3_pos2)#0.043
-kruskal.test(Asp_allergen$Asp.f.5~Asp_allergen$af5_pos2)#0.8486
-kruskal.test(Asp_allergen$Asp.f.6~Asp_allergen$af6_pos2)#0.4669
-
 af3<-ggplot(df, aes(x=factor(af3_pos2), y=Asp.f.3.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 3")+ylab("Asp f 3\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
+af3<-af3+ geom_signif( comparisons = list(c("0","1")),tip_length = 0, map_signif_level = TRUE,size=0,textsize =5)
+
 af5<-ggplot(df, aes(x=factor(af5_pos2), y=Asp.f.5.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 5")+ylab("Asp f 5\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
+f5<-af5+ geom_signif( comparisons = list(c("0","1")),tip_length = 0, annotations = "ns",size=0,textsize =4)
+
 af6<-ggplot(df, aes(x=factor(af6_pos2), y=Asp.f.6.RA))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("purple", "orange2","green3"))+scale_y_log10()+scale_y_log10()+xlab("Asp f 6")+ylab("Asp f 6\nRelative Abundance (%)")+scale_x_discrete(labels=c("Non-Sensitized","Sensitized"))+labs(fill="")
+af6<-af6+ geom_signif( comparisons = list(c("0","1")),tip_length = 0, annotations = "ns",size=0,textsize =4)
 
 tiff("fig4b_d.tiff", units="in", width=12, height=4, res=400)
 ggarrange(af3,af5,af6,labels = NA,common.legend = T,legend="right", ncol=3,nrow=1)
 dev.off()
+
+kruskal.test(Asp_allergen$Asp.f.3.RA~Asp_allergen$af3_pos2)#0.043
+kruskal.test(Asp_allergen$Asp.f.5.RA~Asp_allergen$af5_pos2)#0.8828
+kruskal.test(Asp_allergen$Asp.f.6.RA~Asp_allergen$af6_pos2)#0.4694
 
 #Fig 4 E-H
 in_copd<-subset(Clinical_data, Clinical_data$Study=="Singapore")
@@ -294,13 +296,19 @@ in_copd<-subset(Clinical_data, Clinical_data$Study=="Singapore")
 #f3_env=exposed/exposed and sensitized to Asp f3
 
 f3te<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=Total_Exacerbation))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("No. of Exacerbation\nin the preceding year")+scale_y_continuous(breaks = c(0,2,4,6,8,10))+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
-f3t1<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=Texac1yr))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("No. of Exacerbation\nduring 1 year follow-up")+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
-f3f<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=FEV1_percent_predicted))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("FEV1 % predicted")+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
-f3f<-f3f+labs(y=expression(paste("FEV", scriptstyle("1")," % predicted")))
-f3c<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=CAT_score))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("CAT score")+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
+f3te<-f3te+geom_signif( comparisons = list(c("E","ES")),tip_length = 0, size=0,textsize =4 ,annotations = "ns",y=9)
 
-tiff("fig4e_h.tiff", units="in", width=8, height=6, res=400)
-ggarrange(f3f,f3t1,f3c,f3te,labels = NA,common.legend = F,legend=F, ncol=2,nrow=2)
+f3t1<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=Texac1yr))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("No. of Exacerbation\nduring 1 year follow-up")+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
+f3t1<-f3t1+geom_signif( comparisons = list(c("E","ES")),tip_length = 0, size=0,textsize =6 ,map_signif_level = TRUE,y=2.5)
+
+f3f<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=FEV1_percent_predicted))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("FEV1 % predicted")+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
+f3f<-f3f+labs(y=expression(paste("FEV", scriptstyle("1")," % predicted")))+geom_signif( comparisons = list(c("E","ES")),tip_length = 0, size=0,textsize =6 ,map_signif_level = TRUE,y=70)
+
+f3c<-ggplot(data=subset(in_copd,!is.na(f3_env)), aes(x=factor(f3_env), y=CAT_score))+geom_boxplot(aes(fill=factor(f3_env), alpha=0.3),outlier.color = NA, color="black")+geom_point(aes(fill=factor(f3_env)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+scale_fill_manual(values = c("steelblue", "hotpink","green3"))+xlab("Asp f 3\n")+ylab("CAT score")+labs(fill="")+scale_x_discrete(label=c("E", "E+S"))
+f3c<-f3c+geom_signif( comparisons = list(c("E","ES")),tip_length = 0, size=0,textsize =4 ,annotations = "ns",y=35)
+
+tiff("fig4e_h.tiff", units="in", width=3, height=9, res=400)
+ggarrange(f3f,f3t1,f3c,f3te,labels = NA,common.legend = F,legend=F, ncol=1,nrow=4)
 dev.off()
 
 kruskal.test(in_copd$Total_Exacerbation~in_copd$f3_env)#0.2963
@@ -369,10 +377,10 @@ Asp_allergen$cat10<-Asp_allergen$CAT_score>9 #categorized CAT score to more/equa
 aspc<-subset(Asp_allergen, SampleType%in% c('Indoor' , 'Outdoor')) #subset indoor and outdoor samples
 aspc$Study<-factor(aspc$Study, levels = c("Vancouver","Singapore"))
 
-ffe<-ggplot(aspc, aes(x=factor(FE), y=asp_al))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(Study)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+ylab("No.of Asp f allergens ")+xlab("Frequent Exacerbator\n")+scale_x_discrete(labels=c("No","Yes"))+scale_fill_manual(values = c("red", "blue","blue"), labels = c("Vancouver","Singapore"))+labs(fill="")
-ce<-ggplot(aspc, aes(x=factor(Study), y=asp_al))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(Study)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+ylab("No.of Asp f allergens ")+xlab("Location\n")+scale_x_discrete(labels=c("Vancouver","Singapore"))+scale_fill_manual(values = c("red", "blue","blue"), labels = c("Vancouver","Singapore"))+labs(fill="")
-ccat<-ggplot(aspc, aes(x=factor(cat10), y=asp_al))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(Study)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+ylab("No.of Asp f allergens ")+xlab("CAT score")+scale_x_discrete(labels=c("<10","≥10"))+scale_fill_manual(values = c("red", "blue","blue"), labels = c("Vancouver","Singapore"))+labs(fill="")
-cfev<-ggplot(aspc, aes(x=factor(gold_stage), y=asp_al))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(Study)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+ylab("No.of Asp f allergens ")+xlab("GOLD (FEV1) group")+scale_fill_manual(values = c("red", "blue","blue"), labels = c("Vancouver","Singapore"))+labs(fill="")
+ffe<-ggplot(aspc, aes(x=factor(FE), y=asp_al))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(Study)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+ylab("No.of Asp f allergens ")+xlab("Frequent Exacerbator\n")+scale_x_discrete(labels=c("No","Yes"))+scale_fill_manual(values = c("red", "blue"), labels = c("Vancouver","Singapore"))+labs(fill="")
+ce<-ggplot(aspc, aes(x=factor(Study), y=asp_al))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(Study)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+ylab("No.of Asp f allergens ")+xlab("Location\n")+scale_x_discrete(labels=c("Vancouver","Singapore"))+scale_fill_manual(values = c("red", "blue"), labels = c("Vancouver","Singapore"))+labs(fill="")
+ccat<-ggplot(aspc, aes(x=factor(cat10), y=asp_al))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(Study)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+ylab("No.of Asp f allergens ")+xlab("CAT score")+scale_x_discrete(labels=c("<10","≥10"))+scale_fill_manual(values = c("red", "blue"), labels = c("Vancouver","Singapore"))+labs(fill="")
+cfev<-ggplot(aspc, aes(x=factor(gold_stage), y=asp_al))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(Study)),position = position_jitter(0.1),size=1.5, shape=21)+theme_pubr()+ylab("No.of Asp f allergens ")+xlab("GOLD (FEV1) group")+scale_fill_manual(values = c("red", "blue"), labels = c("Vancouver","Singapore"))+labs(fill="")
 cfev<-cfev+labs(x=expression(paste("GOLD ","(FEV", scriptstyle("1")," % predicted)"," group")))
 
 tiff("Fig6.tiff", units="in", width=8, height=6, res=400)
