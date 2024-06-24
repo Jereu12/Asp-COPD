@@ -418,9 +418,21 @@ ggplot(data=mAirData,aes(x=Type, y=value, fill=variable))+
                                             xlab("")+ylab("Relative abundance (%)")+theme_classic()+labs(fill="")+scale_y_continuous(labels = scales::percent)+scale_x_discrete(labels=c("Sequencing blanks\n(n=6)","Filter Blanks\n(n=9)", "Reagent Blanks\n(n=6)","Samples\n(n=157)"))+theme(legend.text = element_text(face="italic"))
 dev.off()
 
+##Supplementary Figure 2
+td<-ggbarplot(Depth_seq,x="SampleType",y="N_nonhuman",add = "mean_se", error.plot = "upper_errorbar",fill="SampleType", palette = c("purple","orange","green3"), xlab = "")+scale_x_discrete(label=c("Indoor","Outdoor", "Surfaces"))+ylab("Sequencing Depth")
+td<-td+theme(axis.text.x = element_text(size=10))
 
+tr<-ggbarplot(Depth_seq,x="SampleType",y="total_read",add = "mean_se", error.plot = "upper_errorbar",fill="SampleType", palette = c("purple","orange","green3"), xlab = "")+scale_x_discrete(label=c("Indoor","Outdoor", "Surfaces"))+ylab("Total read count")
+tr<-tr+theme(axis.text.x = element_text(size=10))
 
-#Supplementary Figure 2
+fr<-ggbarplot(Depth_seq,x="SampleType",y="fungi_read",add = "mean_se", error.plot = "upper_errorbar",fill="SampleType", palette = c("purple","orange","green3"), xlab = "")+scale_x_discrete(label=c("Indoor","Outdoor", "Surfaces"))+ylab("Fungal read count")
+fr<-fr+theme(axis.text.x = element_text(size=10))
+
+tiff("E-Fig2.tiff", units="in", width=10, height=4, res=400)
+ggarrange(td,tr,fr,labels = NA,common.legend = T,legend="right", ncol=3,nrow=1)
+dev.off()
+
+##Supplementary Figure 3
 c1<-ggscatter(copd_bf, y = "A.fumigatus", x = "Cat.score", color = "SampleType",
               add = "reg.line", conf.int = TRUE, 
               cor.coef = TRUE, cor.method = "spearman",ylab="A. fumigatus\n relative abundance (log 10)",xlab = "CAT score",palette = c("purple", "orange", "green3"),
@@ -440,11 +452,11 @@ f1<-f1+labs(y = ~ atop(paste('',italic("A.fumigatus")),
                              scriptstyle("10"),")")))
 f1<-f1+labs(x=expression(paste("FEV", scriptstyle("1")," % predicted")))
 
-tiff("efig2.tiff", units="in", width=10, height=3, res=400)
+tiff("efig3.tiff", units="in", width=10, height=3, res=400)
 ggarrange(c1,f1,labels = NA,common.legend = T,legend="right", ncol=2,nrow=1)
 dev.off()
 
-#Supplementary Figure 3
+##Supplementary Figure 4
 
 tt<-ggscatter(Clinical_data, y = "Temp", x = "Total_Exacerbation", 
               add = "reg.line", conf.int = TRUE, 
@@ -466,16 +478,16 @@ tp2<-ggscatter(Clinical_data, y = "pm25", x = "Total_Exacerbation",
                cor.coef = TRUE, cor.method = "spearman",xlab = "No. of Exacerbations\nin the preceding year",
                cor.coeff.args = list(method = "spearman", label.x.npc = "left", label.y = 150),add.params = list(color = "blue", fill = "lightgray", linetype=2))+ scale_x_continuous(breaks = seq(1, 12, 3))+labs(color="")+ylab("PM 2.5 (µg/m3)")
 
-tiff("e-fig3.tiff", units="in", width=10, height=3, res=400)
+tiff("e-fig4.tiff", units="in", width=10, height=3, res=400)
 ggarrange(tt,tr,tp2,tp,labels = NA,common.legend = T,legend="bottom", ncol=4,nrow=1)
 dev.off()
 
-##Supplementary Figure 4
+##Supplementary Figure 5
 
 library(ggbreak)
 mAirData <- melt(sputum_ITS)
 
-tiff("e-fig4.tiff", units="in", width=6, height=6, res=400)
+tiff("e-fig5a.tiff", units="in", width=6, height=6, res=400)
 
 p1<-ggplot(data=mAirData,aes(x=Sputum, y=value, fill=variable))+
   geom_bar(stat="identity", position="fill") +
@@ -489,13 +501,13 @@ dev.off()
 f2<-cbind(env_data,Master)
 sp<-subset(f2, sputum_asp%in% c('Yes' , 'No'))
 
-tiff("e-fig4b.tiff", units="in", width=5, height=4, res=400)
+tiff("e-fig5b.tiff", units="in", width=5, height=4, res=400)
 p2<-ggplot(sp, aes(x=factor(sputum_asp), y=A.fumigatus))+geom_boxplot(outlier.color = NA, color="black")+geom_point(aes(fill=factor(SampleType)),position = position_jitter(0.1),size=2.5, shape=21)+theme_pubr()+stat_compare_means( method="kruskal.test", aes(label = ..p.signif..), size=4,label.x = 1.5)+scale_fill_manual(values = c("purple", "orange","green2","grey"))+xlab("Sputum Aspergillus")+ylab("Environmental Aspergillus\n Relative abundance (%)")+labs(fill="")+ theme(legend.position="right")
 p2+labs(y = ~ atop(paste('Environmental ',italic("Aspergillus")),
                    paste("Relative abundance (%)") ))+labs(x = ~ atop(paste('Sputum ',italic("Aspergillus")),paste('(by 18S ITS Sequencing)') ))
 dev.off()
 
-#sSupplementary Fig 5A
+##Supplementary Fig 6A
 f2<-cbind(Master,env_data)
 
 a<-f2[,c(4:89)]
@@ -515,7 +527,7 @@ gg <- data.frame(cluster=factor(Master$labels.Type), x=Master$Dim1, y=Master$Dim
 centroids <- aggregate(cbind(x,y)~cluster,data=gg,mean)
 gg <- merge(gg,centroids,by="cluster",suffixes=c("",".centroid"))
 
-tiff("e-fig5a.tiff", units="in", width=6, height=4, res=400)
+tiff("e-fig6a.tiff", units="in", width=6, height=4, res=400)
 ggplot(gg) +
   scale_linetype_identity() + 
   geom_segment(aes(x=x.centroid, y=y.centroid, xend=x, yend=y, colour = cluster), alpha=0.4)+
@@ -528,11 +540,11 @@ ggplot(gg) +
 dev.off()
 
 
-#Supplementary Fig 5B
+#Supplementary Fig 6B
 
 mAirData <- melt(biome.Species)
 
-tiff("species_country_um2.tiff", units="in", width=10, height=6, res=400)
+tiff("e-fig6b.tiff", units="in", width=10, height=6, res=400)
 
 ggplot(data=mAirData,aes(x=SampleType, y=value, fill=variable))+
   geom_bar(stat="identity", position="fill") +
@@ -548,10 +560,10 @@ ggplot(data=mAirData,aes(x=SampleType, y=value, fill=variable))+
 dev.off()
 
 
-#Supplementary Figure 6
+##Supplementary Figure 7
 asp.country1$Species<-factor(asp.country1$Species, levels = c("A.terreus", "A.mulundensis", "A.novofumigatus","A.heteromorphus","A.niger","A.clavatus","A.glaucus", "A.steynii","A.pseudoglaucus","A.awamori", "A.welwitschiae","A.aculeatinus", "A.nidulans","A.fumigatus" ))
 
-tiff("asp_barchart_sg.tiff", units="in", width=8, height=8, res=400)
+tiff("e-fig7.tiff", units="in", width=8, height=8, res=400)
 
 sf5<-ggplot(data=asp.country1,aes(x=Species, y=Value,fill=Country))+
   geom_bar(stat="identity", position="dodge") +
@@ -562,14 +574,14 @@ sf5+labs(y = ~ atop(paste('Percentage (%) of home with detectable ',italic("Aspe
 dev.off()
 
 
-#Supplementary Figure 7
+##Supplementary Figure 8
 
 asp<-subset(Asp_allergen, SampleType%in% c('Indoor' , 'Outdoor'))#exclude surfaces
 
 f4c<-asp[,c(20:34,36:42)]#exclude Asp.f17 as is zero in all samples
 f4c<-t(f4c)
 
-tiff("allergen_io_ab_pheatmap_all.tiff", units="in", width=10, height=4, res=400)
+tiff("e-fig8.tiff", units="in", width=10, height=4, res=400)
 pheatmap(f4c,cluster_cols = F, cluster_rows = F, fontsize = 9, show_colnames=F,color = 
            c("aliceblue","aliceblue","white","lightskyblue1","dodgerblue","royalblue4"),scale = "row",gaps_col = c(43,43,86,86,98,98))
 dev.off()
